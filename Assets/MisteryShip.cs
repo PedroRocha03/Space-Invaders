@@ -4,13 +4,14 @@ using UnityEngine;
 public class MysteryShip : MonoBehaviour
 {
     public float speed = 5f;               // Velocidade de movimento da nave
-    public float cycleTime = 30f;          // Tempo entre as apariÁıes da nave
-    public int score = 300;                // PontuaÁ„o ao destruir a nave
+    public float cycleTime = 30f;          // Tempo entre as apari√ß√µes da nave
+    public int score = 300;                // Pontua√ß√£o ao destruir a nave
 
     private Vector2 leftDestination;
     private Vector2 rightDestination;
     private int direction = -1;
     private bool spawned;
+    private bool isDestroyed = false;      // Flag para verificar se a nave foi destru√≠da
 
     private void Start()
     {
@@ -22,14 +23,14 @@ public class MysteryShip : MonoBehaviour
         leftDestination = new Vector2(leftEdge.x - 1f, transform.position.y);
         rightDestination = new Vector2(rightEdge.x + 1f, transform.position.y);
 
-        Despawn();  // Inicializa a nave como desaparecida
+        Spawn();  // Inicializa a nave
     }
 
     private void Update()
     {
-        if (!spawned) return;
+        if (!spawned || isDestroyed) return;
 
-        // Movimenta a nave para a direita ou para a esquerda dependendo da direÁ„o
+        // Movimenta a nave para a direita ou para a esquerda dependendo da dire√ß√£o
         if (direction == 1)
         {
             MoveRight();
@@ -64,7 +65,7 @@ public class MysteryShip : MonoBehaviour
         }
     }
 
-    // Faz a nave m„e aparecer na tela
+    // Faz a nave aparecer na tela
     private void Spawn()
     {
         direction *= -1;
@@ -95,17 +96,22 @@ public class MysteryShip : MonoBehaviour
             transform.position = leftDestination;
         }
 
-        // Chama o mÈtodo Spawn para fazer a nave reaparecer apÛs o ciclo
-        Invoke(nameof(Spawn), cycleTime);
+        // Se a nave n√£o foi destru√≠da, reaparece ap√≥s o ciclo
+        if (!isDestroyed)
+        {
+            Invoke(nameof(Spawn), cycleTime);
+        }
     }
 
-    // Detecta colisıes com lasers
+    // Detecta colis√µes com lasers
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("Laser"))  // Verifica se foi atingida por um laser
         {
+            isDestroyed = true; // Marca a nave como destru√≠da
+            GameManager.Instance.OnMysteryShipKilled(this);  // Notifica o GameManager
             Despawn();  // Desaparece da tela
-            GameManager.Instance.OnMysteryShipKilled(this);  // Chama o mÈtodo para atualizar a pontuaÁ„o
+            Destroy(gameObject); // Destroi a nave
         }
     }
 }

@@ -4,32 +4,43 @@ using UnityEngine;
 
 public class Invaderr : MonoBehaviour
 {
-    public GameObject missilePrefab;  // Referência ao prefab do projétil
-    public float fireRate = 2f;       // Taxa de disparo (tempo entre os tiros)
+    public GameObject missilePrefab;  // ReferÃªncia ao prefab do projÃ©til
+    public float fireRateMin = 1f;       // Taxa de disparo mÃ­nima (tempo entre os tiros)
+    public float fireRateMax = 3f;       // Taxa de disparo mÃ¡xima (tempo entre os tiros)
     public int score = 10;
-    private float lastFireTime;
     private bool canShoot = true;
 
     private void Start()
     {
-        // Inicia o disparo com uma pequena espera
+        // Inicia o disparo com uma pequena espera para evitar disparos imediatos
         StartCoroutine(FireMissileCoroutine());
     }
 
     private void Update()
     {
-        // Você pode colocar aqui outras lógicas do Invader, como movimentação, por exemplo
+        // Outras lÃ³gicas do Invader podem ir aqui, como movimentaÃ§Ã£o, por exemplo.
     }
 
     private IEnumerator FireMissileCoroutine()
     {
+        // Espera um pequeno tempo antes do primeiro disparo (evita que todos atirem imediatamente)
+        yield return new WaitForSeconds(Random.Range(0f, 1f));
+
         while (true)
         {
             if (canShoot)
             {
-                FireMissile();
+                // Com probabilidade de 1/3 (33%), o invader pode disparar
+                if (Random.value < 0.23f)
+                {
+                    FireMissile();
+                }
                 canShoot = false;
-                // Espera o tempo definido para o próximo disparo
+
+                // Tempo de disparo aleatÃ³rio para cada invader
+                float fireRate = Random.Range(fireRateMin, fireRateMax); 
+
+                // Espera o tempo definido para o prÃ³ximo disparo
                 yield return new WaitForSeconds(fireRate);
                 canShoot = true;
             }
@@ -39,19 +50,19 @@ public class Invaderr : MonoBehaviour
 
     private void FireMissile()
     {
-        // Instancia o projétil do invader
+        // Instancia o projÃ©til do invader
         Instantiate(missilePrefab, transform.position, Quaternion.identity);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Aqui você pode verificar se o projétil do invader atingiu o jogador
+        // Verifica se o projÃ©til do invader atingiu o jogador
         if (other.CompareTag("Player"))
         {
             PlayerControl player = other.GetComponent<PlayerControl>();
             if (player != null)
             {
-                GameManager.Instance.OnPlayerKilled(player);  // Chama o método de morte do jogador
+                GameManager.Instance.OnPlayerKilled(player);  // Chama o mÃ©todo de morte do jogador
             }
 
             Destroy(other.gameObject);  // Destroi o jogador

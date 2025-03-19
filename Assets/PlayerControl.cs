@@ -16,6 +16,11 @@ public class PlayerControl : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
     }
 
+    public void Die()
+    {
+        gameObject.SetActive(false); // Desativa o jogador
+    }
+
     void Update()
     {
         var pos = transform.position;

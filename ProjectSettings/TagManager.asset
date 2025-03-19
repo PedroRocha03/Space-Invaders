@@ -8,6 +8,7 @@ TagManager:
   - Invader2
   - Invader3
   - Laser
+  - Bouncer
   layers:
   - Default
   - TransparentFX

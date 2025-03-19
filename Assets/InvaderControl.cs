@@ -6,8 +6,9 @@ public class InvaderControl : MonoBehaviour
 {
     private Rigidbody2D rb2d;
     private float timer = 0.0f;
-    private float waitTime = 1.0f;
+    private float waitTime = 2.0f;
     private float speed = 1.0f;
+    private float descentAmount = 0.1f;
 
     void Start()
     {
@@ -16,9 +17,15 @@ public class InvaderControl : MonoBehaviour
         var vel = rb2d.velocity;
         vel.x = speed;
         rb2d.velocity = vel;
+
+        // Altera a cor do sprite para branco
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.white;
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
         timer += Time.deltaTime;
@@ -27,15 +34,24 @@ public class InvaderControl : MonoBehaviour
             ChangeState();
             timer = 0.0f;
         }
-
     }
 
     void ChangeState()
     {
         var vel = rb2d.velocity;
-        vel.x *= -1;
+        vel.x *= -1; // Inverte a direção horizontal
         rb2d.velocity = vel;
+
+        // Faz os invasores descerem
+        transform.position += Vector3.down * descentAmount;
     }
 
-
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Verifica se o invasor colidiu com o Bouncer
+        if (other.CompareTag("Bouncer"))
+        {
+            GameManager.Instance.GameOver(); // Chama o Game Over
+        }
+    }
 }

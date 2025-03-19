@@ -15,8 +15,9 @@ public class GameManager : MonoBehaviour
     private PlayerControl player;
     private int score = 0;
     private int lives = 3;
+    private int totalInvaders; // Contador de invasores restantes
 
-    void Awake()
+    private void Awake()
     {
         if (Instance == null)
         {
@@ -26,8 +27,14 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if (livesText == null)
+        {
+            Debug.LogError("LivesText is not assigned in the Inspector!");
+        }
     }
 
+    [System.Obsolete]
     private void Start()
     {
         player = FindObjectOfType<PlayerControl>();
@@ -35,6 +42,19 @@ public class GameManager : MonoBehaviour
         if (player == null)
         {
             Debug.LogError("PlayerControl not found!");
+        }
+
+        // Conta quantos invasores existem no in√≠cio do jogo
+        totalInvaders = FindObjectsOfType<Invaderr>().Length;
+
+        // Altera a cor de todos os invasores para branco
+        foreach (Invaderr invader in FindObjectsOfType<Invaderr>())
+        {
+            SpriteRenderer spriteRenderer = invader.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = Color.white;
+            }
         }
 
         NewGame();
@@ -46,6 +66,12 @@ public class GameManager : MonoBehaviour
         {
             NewGame();
         }
+
+        // Verifica se o score atingiu 1800 pontos
+        if (score >= 800)
+        {
+            Victory();
+        }
     }
 
     private void NewGame()
@@ -53,21 +79,50 @@ public class GameManager : MonoBehaviour
         gameOverUI.SetActive(false);
         score = 0;
         lives = 3;
+
+        if (livesText != null)
+        {
+            livesText.text = "Lives: " + lives.ToString();
+        }
+
         UpdateScoreUI();
         Respawn();
     }
 
     private void Respawn()
     {
-        Vector3 position = player.transform.position;
-        position.x = 0f;
-        player.transform.position = position;
-        player.gameObject.SetActive(true);
+        if (player != null)
+        {
+            player.gameObject.SetActive(true);
+            player.transform.position = new Vector3(0f, player.transform.position.y, player.transform.position.z);
+        }
     }
 
-    private void GameOver()
+    private IEnumerator RespawnWithDelay(float delay)
     {
-        //gameOverUI.SetActive(true);
+        yield return new WaitForSeconds(delay);
+        Respawn();
+    }
+
+    // M√©todo GameOver agora √© p√∫blico
+    public void GameOver()
+    {
+        // Salva o score final
+        PlayerPrefs.SetInt("FinalScore", score);
+        PlayerPrefs.Save();
+
+        // Carrega a cena de game over
+        SceneManager.LoadScene("GameOverScene");
+    }
+
+    private void Victory()
+    {
+        // Salva o score final
+        PlayerPrefs.SetInt("FinalScore", score);
+        PlayerPrefs.Save();
+
+        // Carrega a cena de vit√≥ria
+        SceneManager.LoadScene("VictoryScene");
     }
 
     private void UpdateScoreUI()
@@ -76,13 +131,24 @@ public class GameManager : MonoBehaviour
         {
             scoreText.text = "Score: " + score.ToString().PadLeft(4, '0');
         }
+        else
+        {
+            Debug.LogWarning("scoreText is not assigned in the Inspector!");
+        }
     }
 
     public void OnInvaderKilled(Invaderr invader)
     {
-        score += invader.score; // Adiciona a pontuaÁ„o correta do inimigo
+        score += invader.score;
         UpdateScoreUI();
         Destroy(invader.gameObject);
+
+        // Verifica se todos os invasores foram destru√≠dos
+        totalInvaders--;
+        if (totalInvaders <= 0 || score >= 1800)
+        {
+            Victory(); // Chama a tela de vit√≥ria
+        }
     }
 
     public void OnPlayerKilled(PlayerControl player)
@@ -92,18 +158,17 @@ public class GameManager : MonoBehaviour
 
         if (lives <= 0)
         {
-            GameOver();
+            GameOver(); // Chama a tela de derrota
         }
         else
         {
-            Respawn();
+            StartCoroutine(RespawnWithDelay(2f)); // Respawn ap√≥s 2 segundos
         }
     }
 
     public void OnMysteryShipKilled(MysteryShip mysteryShip)
     {
-        score += mysteryShip.score;  // Adiciona a pontuaÁ„o da nave m„e
-        UpdateScoreUI();  // Atualiza o UI da pontuaÁ„o
+        score += mysteryShip.score;
+        UpdateScoreUI();
     }
-
 }

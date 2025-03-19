@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5b400c15a5180a946b2e0ec928307007
+guid: e9e74d139c70db34f8799f967d218318
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 9082429109045791810
-    second: Laser_0
+      213: 3767881592698423433
+    second: pixel-art-space-animation-planet-footage-149574327_iconl_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Laser_0
+      name: pixel-art-space-animation-planet-footage-149574327_iconl_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2
-        height: 6
+        width: 480
+        height: 253
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -114,8 +114,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 24c875667254b0e70800000000000000
-      internalID: 9082429109045791810
+      spriteID: 988c58078543a4430800000000000000
+      internalID: 3767881592698423433
       vertices: []
       indices: 
       edges: []
@@ -130,8 +130,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      Laser_0: 9082429109045791810
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
